@@ -1,10 +1,6 @@
 import {
-  AppBar,
-  Box,
   Button,
-  Container,
   FormControl,
-  Link,
   Paper,
   Table,
   TableBody,
@@ -13,51 +9,49 @@ import {
   TableHead,
   TableRow,
   TextField,
-  Toolbar,
-  Typography,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
-import IRestaurante from '../../../interfaces/IRestaurante';
+import IPrato from '../../../interfaces/IPrato';
 import { Link as RouterLink } from 'react-router-dom';
 import http from '../../../http';
 
-const AdministracaoRestaurantes = () => {
-  const [restaurantes, setRestaurantes] = useState<IRestaurante[]>([]);
+const AdministracaoPratos = () => {
+  const [pratos, setPratos] = useState<IPrato[]>([]);
   const [search, setSearch] = useState('');
   useEffect(() => {
     http
-      .get<IRestaurante[]>('restaurantes/')
+      .get<IPrato[]>('pratos/')
       .then((resposta) => {
-        setRestaurantes(resposta.data);
+        setPratos(resposta.data);
       })
       .catch((err) => {});
   }, []);
 
-  const excluir = (restauranteExcluir: IRestaurante) => {
+  const excluir = (restauranteExcluir: IPrato) => {
     http
-      .delete(`restaurantes/${restauranteExcluir.id}/`)
+      .delete(`pratos/${restauranteExcluir.id}/`)
       .then((resposta) => {
-        alert(`Restaurante "${restauranteExcluir.nome}" excluido com sucesso!`);
-        const listaRestaurate = restaurantes.filter(
-          (restaurante) => restaurante.id !== restauranteExcluir.id
+        alert(`Prato "${restauranteExcluir.nome}" excluido com sucesso!`);
+        const listaRestaurate = pratos.filter(
+          (prato) => prato.id !== restauranteExcluir.id
         );
-        setRestaurantes([...listaRestaurate]);
+        setPratos([...listaRestaurate]);
       })
       .catch((err) => {
         alert('Ocorreu um erro inesperado ao deletar');
       });
   };
 
-  const pesquisarRestaurantes = () => {
+  const pesquisarPratos = () => {
     http
-      .get<IRestaurante[]>('restaurantes/', {
+      .get<IPrato[]>('pratos/', {
         params: {
           ordering: 'nome',
           search,
         },
       })
       .then((resposta) => {
-        setRestaurantes(resposta.data);
+        setPratos(resposta.data);
       })
       .catch((err) => {});
   };
@@ -69,13 +63,13 @@ const AdministracaoRestaurantes = () => {
           value={search}
           onChange={(evento) => setSearch(evento.target.value)}
           id="standard-basic"
-          label="Nome do Restaurante"
+          label="Nome do Prato"
           variant="standard"
         />
         <Button
           type="submit"
           variant="outlined"
-          onClick={() => pesquisarRestaurantes()}
+          onClick={() => pesquisarPratos()}
         >
           Pesquisar
         </Button>
@@ -85,17 +79,25 @@ const AdministracaoRestaurantes = () => {
           <TableHead>
             <TableRow>
               <TableCell>Nome</TableCell>
+              <TableCell>Descrição</TableCell>
+              <TableCell>Tag</TableCell>
+              <TableCell>Imagem</TableCell>
               <TableCell>Editar</TableCell>
               <TableCell>Excluir</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {restaurantes.map((restaurante) => (
-              <TableRow key={restaurante.id}>
-                <TableCell>{restaurante.nome}</TableCell>
+            {pratos.map((prato) => (
+              <TableRow key={prato.id}>
+                <TableCell>{prato.nome}</TableCell>
+                <TableCell>{prato.descricao}</TableCell>
+                <TableCell>{prato.tag}</TableCell>
+                <TableCell>
+                  [<a href={prato.imagem} target="_blank" rel="noreferrer">ver imagem</a>]
+                </TableCell>
                 <TableCell>
                   [
-                  <RouterLink to={`/admin/restaurantes/${restaurante.id}`}>
+                  <RouterLink to={`/admin/pratos/${prato.id}`}>
                     Editar
                   </RouterLink>
                   ]
@@ -104,7 +106,7 @@ const AdministracaoRestaurantes = () => {
                   <Button
                     variant="outlined"
                     color="error"
-                    onClick={() => excluir(restaurante)}
+                    onClick={() => excluir(prato)}
                   >
                     Excluir
                   </Button>
@@ -118,4 +120,4 @@ const AdministracaoRestaurantes = () => {
   );
 };
 
-export default AdministracaoRestaurantes;
+export default AdministracaoPratos;
